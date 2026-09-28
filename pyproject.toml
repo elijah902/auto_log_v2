@@ -1,0 +1,24 @@
+[project]
+name = "auto-log"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "elijah902", email = "elijahajjones@gmail.com" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "garminconnect>=0.3.11",
+    "google-api-python-client>=2.199.0",
+    "google-auth>=2.57.0",
+    "google-auth-httplib2>=0.4.2",
+    "google-auth-oauthlib>=1.4.1",
+    "google-oauth>=1.0.1",
+]
+
+[project.scripts]
+auto-log = "auto_log:main"
+
+[build-system]
+requires = ["uv_build>=0.12.6,<0.13.0"]
+build-backend = "uv_build"
