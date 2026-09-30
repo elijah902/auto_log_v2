@@ -123,8 +123,8 @@ def init_api() -> Garmin | None:
         except KeyboardInterrupt:
             return None
 
-def main():
-    api = init_api()
+
+def fetch_data(api):
     if not api:
         return
 
@@ -142,6 +142,12 @@ def main():
         print(f"Resting HR : {hr.get('restingHeartRate', 3)}")
     elif err:
         print(f"Could not fetch heart rate: {err}")
+
+
+def main():
+    api = init_api()
+    fetch_data(api)
+
 
 if __name__ == "__main__":
     with contextlib.suppress(KeyboardInterrupt):
