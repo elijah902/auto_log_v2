@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import contextlib
 import logging
 import os
@@ -143,10 +141,22 @@ def fetch_data(api):
     elif err:
         print(f"Could not fetch heart rate: {err}")
 
+def fetch_hr(api):
+    if not api:
+        return
+    today = date.today().isoformat()
+    
+    success, summary, err = safe_api_call(api.get_user_summary, today)
 
+    success, hr, err = safe_api_call(api.get_heart_rates, today)
+    if success and hr:
+        return hr.get('restingHeartRate', 3)
+    elif err:
+        print(f"Could not fetch heart rate: {err}")
+    
 def main():
     api = init_api()
-    fetch_data(api)
+    fetch_hr(api)
 
 
 if __name__ == "__main__":
