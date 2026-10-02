@@ -11,10 +11,7 @@ from googleapiclient.errors import HttpError
 
 # If modifying these scopes, delete the file token.json.
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
-
-# The ID and range of a sample spreadsheet.
 SPREADSHEET_ID = "1Bc-QPUUAFrdpFK19iSIm1P5DsE7_hy2RpiYpQFDM3Ao"
-# RANGE_NAME = "'2026-2027'!J63:J354"
 
 
 def get_todays_date():
@@ -70,16 +67,6 @@ def update_values(spreadsheet_id, range_name, value_input_option, values, creds)
   except HttpError as error:
     print(f"An error occurred: {error}")
     return error
-  
-
-
-def get_hr_cell():
-  """
-  read 1 row where date_col = target
-  """
-  # try 
-  # service = build("sheets", "v4", credentials=)
-  
   
   
 def write_hr(cell):
