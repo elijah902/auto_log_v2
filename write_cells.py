@@ -1,7 +1,6 @@
-from fetch_garmin_data import fetch_hr, init_api, fetch_mileage, fetch_running_time
-from datetime import datetime
-
 import os.path
+from fetch_garmin_data import init_api, fetch_hr, fetch_mileage, fetch_running_time
+from datetime import datetime
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -16,16 +15,16 @@ Why doesn't fetch_mileage require api?
 """
 # If modifying these scopes, delete the file token.json.
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
-SPREADSHEET_ID = "1Bc-QPUUAFrdpFK19iSIm1P5DsE7_hy2RpiYpQFDM3Ao"
+SPREADSHEET_ID = "1Bc-QPUUAFrdpFK19iSIm1P5DsE7_hy2RpiYpQFDM3Ao" 
 
-creds = None
+
 def authenticate():
   """
   The file token.json stores the user's access and refresh tokens, and is
   created automatically when the authorization flow completes for the first
   time.
   """
-  
+  creds = None 
   if os.path.exists("token.json"):
     creds = Credentials.from_authorized_user_file("token.json", SCOPES)
   # If there are no (valid) credentials available, let the user log in.
@@ -40,7 +39,7 @@ def authenticate():
     # Save the credentials for the next run
     with open("token.json", "w") as token:
       token.write(creds.to_json())  
-      
+  return creds
       
 
 def get_todays_date():
@@ -105,84 +104,29 @@ def update_values(spreadsheet_id, range_name, value_input_option, values, creds)
     print(f"An error occurred: {error}")
     return error
   
-  
-def write_hr(cell):
-  """
+
+
+"""
   The file token.json stores the user's access and refresh tokens, and is
   created automatically when the authorization flow completes for the first
   time.
-  """
-  creds = None
-  if os.path.exists("token.json"):
-    creds = Credentials.from_authorized_user_file("token.json", SCOPES)
-  # If there are no (valid) credentials available, let the user log in.
-  if not creds or not creds.valid:
-    if creds and creds.expired and creds.refresh_token:
-      creds.refresh(Request())
-    else:
-      flow = InstalledAppFlow.from_client_secrets_file(
-          "credentials.json", SCOPES
-      )
-      creds = flow.run_local_server(port=0)
-    # Save the credentials for the next run
-    with open("token.json", "w") as token:
-      token.write(creds.to_json())
-  api = init_api()
+"""  
+def write_hr(cell, creds, api):
   update_values(SPREADSHEET_ID, cell, "RAW", [[fetch_hr(api)]], creds)
 
-def write_distance(cell):
-  """
-  The file token.json stores the user's access and refresh tokens, and is
-  created automatically when the authorization flow completes for the first
-  time.
-  """
-  creds = None
-  if os.path.exists("token.json"):
-    creds = Credentials.from_authorized_user_file("token.json", SCOPES)
-  # If there are no (valid) credentials available, let the user log in.
-  if not creds or not creds.valid:
-    if creds and creds.expired and creds.refresh_token:
-      creds.refresh(Request())
-    else:
-      flow = InstalledAppFlow.from_client_secrets_file(
-          "credentials.json", SCOPES
-      )
-      creds = flow.run_local_server(port=0)
-    # Save the credentials for the next run
-    with open("token.json", "w") as token:
-      token.write(creds.to_json())
-  api = init_api()
-  update_values(SPREADSHEET_ID, cell, "RAW", [[fetch_mileage()]], creds)
+def write_distance(cell, creds, api):
+  update_values(SPREADSHEET_ID, cell, "RAW", [[fetch_mileage(api)]], creds)
   
 # Writes running time  
-def write_time(cell):
-  """
-  The file token.json stores the user's access and refresh tokens, and is
-  created automatically when the authorization flow completes for the first
-  time.
-  """
-  creds = None
-  if os.path.exists("token.json"):
-    creds = Credentials.from_authorized_user_file("token.json", SCOPES)
-  # If there are no (valid) credentials available, let the user log in.
-  if not creds or not creds.valid:
-    if creds and creds.expired and creds.refresh_token:
-      creds.refresh(Request())
-    else:
-      flow = InstalledAppFlow.from_client_secrets_file(
-          "credentials.json", SCOPES
-      )
-      creds = flow.run_local_server(port=0)
-    # Save the credentials for the next run
-    with open("token.json", "w") as token:
-      token.write(creds.to_json())
-  api = init_api()
-  update_values(SPREADSHEET_ID, cell, "RAW", [[fetch_running_time()]], creds)
+def write_time(cell, creds, api):
+  update_values(SPREADSHEET_ID, cell, "RAW", [[fetch_running_time(api)]], creds)
 
 def main():
-  # authenticate()
-  write_hr(f"'2026-2027'!P{fetch_todays_cell()}")
-  write_distance(f"'2026-2027'!K{fetch_todays_cell()}")
-  write_time(f"'2026-2027'!L{fetch_todays_cell()}")
+  creds = authenticate()
+  api = init_api()
+  write_hr(f"'2026-2027'!P{fetch_todays_cell()}", creds, api)
+  write_distance(f"'2026-2027'!K{fetch_todays_cell()}", creds, api)
+  write_time(f"'2026-2027'!L{fetch_todays_cell()}", creds, api)
+
 if __name__ == "__main__":
   main()
