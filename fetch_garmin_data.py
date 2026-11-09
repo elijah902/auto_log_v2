@@ -16,7 +16,7 @@ from garminconnect import (
 )
 
 today = date.today().isoformat()
-yesterday = (date.today() - timedelta(days=1)).isoformat()
+
 
 logging.getLogger("garminconnect").setLevel(logging.CRITICAL)
 
@@ -126,43 +126,41 @@ def init_api() -> Garmin | None:
             return None
 
 
-def fetch_data(api):
-    if not api:
-        return
+# def fetch_data(api):
+#     if not api:
+#         return
 
-    success, summary, err = safe_api_call(api.get_user_summary, today)
-    if success and summary:
-        print(f"Calories    : {summary.get('totalKilocalories', 0):.0f} kcal")
+#     # success, summary, err = safe_api_call(api.get_user_summary, today)
+#     # if success and summary:
+#     #     print(f"Calories    : {summary.get('totalKilocalories', 0):.0f} kcal")
 
-    elif err:
-        print(f"Could not fetch summary: {err}")
+#     # elif err:
+#     #     print(f"Could not fetch summary: {err}")
 
-    success, hr, err = safe_api_call(api.get_heart_rates, today)
-    if success and hr:
-        print(f"Resting HR : {hr.get('restingHeartRate', 3)}")
-    elif err:
-        print(f"Could not fetch heart rate: {err}")
+#     success, hr, err = safe_api_call(api.get_heart_rates, today)
+#     if success and hr:
+#         print(f"Resting HR : {hr.get('restingHeartRate', 3)}")
+#     elif err:
+#         print(f"Could not fetch heart rate: {err}")
 
 def fetch_hr(api):
     if not api:
         return
     
-
     success, hr, err = safe_api_call(api.get_heart_rates, today)
     if success and hr:
         return hr.get('restingHeartRate', 3)
     elif err:
         print(f"Could not fetch heart rate: {err}")
 
-def fetch_mileage():
-    
-    runs = init_api().get_activities_by_date(yesterday, yesterday, activitytype="running")
+def fetch_mileage(api: Garmin) -> float:
+    runs = init_api().get_activities_by_date(today, today, activitytype="running")
     total_meters = sum(run["distance"] for run in runs)
     total_miles = round((total_meters/1609.344), 2)
     return total_miles
 
-def fetch_running_time():
-    runs = init_api().get_activities_by_date(yesterday, yesterday, activitytype="running")
+def fetch_running_time(api: Garmin) -> float:
+    runs = api.get_activities_by_date(today, today, activitytype="running")
     move_time = sum(run["movingDuration"] for run in runs)
     result = time.strftime('%H:%M:%S', time.gmtime(move_time))
     return result
@@ -170,9 +168,9 @@ def fetch_running_time():
     
 def main():
     api = init_api()
-    # fetch_hr(api)
-    # print(fetch_mileage())
-    fetch_running_time()
+    # print(fetch_hr(api))
+    # print(fetch_mileage(api))
+    # print(fetch_running_time(api))
 if __name__ == "__main__":
     with contextlib.suppress(KeyboardInterrupt):
         main()
